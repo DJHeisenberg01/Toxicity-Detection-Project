@@ -75,7 +75,7 @@ class TwitchDataCollector:
                 messages = self.extract_chat_from_vod(vod_id)
                 all_chats[vod_url] = messages
             except Exception as e:
-                print(f"❌ Errore nel processare VOD {vod_id}: {e}")
+                print(f"Errore nel processare VOD {vod_id}: {e}")
                 continue
             
         print(f"Raccolta completa! Ottenuti {len(all_chats)} VOD con chat")
@@ -89,5 +89,77 @@ class TwitchDataCollector:
         
         print(f"Dati salvati in {filename}")
 
+# FUNZIONE PER PRENDERE DATASET ESTERNI??
+
+# MANCA LA FUNZIONE DI ETICHETTATURA
 
 
+def convert_twitch_json_to_dataframe(json_file_path: str) -> pd.DataFrame:
+    
+    print(f"📊 Convertendo {json_file_path} in DataFrame...")
+    
+    with open(json_file_path, 'r', encoding='utf-8') as f:
+        data = json.load(f)
+    
+    all_messages = []
+    
+    for video_url, messages in data.items():
+        for msg in messages:
+            all_messages.append({
+                'video_url': video_url,
+                'author': msg.get('author', ''),
+                'message': msg.get('message', ''),
+                'badges': msg.get('badges', []),
+                'timestamp': msg.get('timestamp', 0),
+                'time_in_seconds': msg.get('time_in_seconds', 0)
+            })
+    
+    df = pd.DataFrame(all_messages)
+    print(f"Convertiti {len(df)} messaggi in DataFrame")
+    return df
+
+
+def main_data_collection():
+    print("Inizio raccolta dati...")
+
+    os.makedirs("data/raw", exist_ok=True)
+    os.makedirs("data/processed", exist_ok=True)
+
+    collector = TwitchDataCollector()
+
+    streamers = [
+        "DarioMocciaTwitch",
+        "Tumblurr",
+        "lollolacustre"
+    ]
+    
+    all_collected_data = {}
+    
+    for streamer in streamers:
+        print(f"Raccolta dati per {streamer}...")
+        try:
+            chats = collector.collect_chats_from_user(streamer, n_vods=3)
+            all_collected_data.update(chats)
+        except Exception as e:
+            print(f"Errore nella raccolta dati per {streamer}: {e}")
+            continue
+        
+    if all_collected_data:
+        output_filename = "data/raw/all_collected_data.json"
+        collector.save_chats_to_json(all_collected_data, output_filename)
+        
+        df = convert_twitch_json_to_dataframe(output_filename)
+        df.to_csv("data/processed/twitch_messages.csv", index=False)
+        
+        print("Raccolta dati completata con successo!")
+    
+
+
+if __name__ == "__main__":
+    main_data_collection()
+        
+    
+    
+    
+    
+	

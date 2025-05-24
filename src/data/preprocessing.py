@@ -3,7 +3,6 @@ import pandas as pd
 import json
 import re
 from sklearn.model_selection import train_test_split
-from pathlib import Path
 
 
 def clean_message(msg):
@@ -33,14 +32,13 @@ def preprocess_dataframe(df):
     return df[df['cleaned'].str.strip() != ""]
 
 
-df = load_json("../data/raw/cleaned_convert.json")
+df = pd.read_csv("../data/processed/twitch_messages.csv")
 df_clean = preprocess_dataframe(df)
 
 
 train, temp = train_test_split(df_clean, test_size=0.3, random_state=42)
 val, test = train_test_split(temp, test_size=0.5, random_state=42)
 
-Path("../data/processed").mkdir(parents=True, exist_ok=True)
 train.to_csv("../data/processed/train.csv", index=False)
 val.to_csv("../data/processed/val.csv", index=False)
 test.to_csv("../data/processed/test.csv", index=False)
