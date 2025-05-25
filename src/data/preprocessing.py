@@ -6,6 +6,8 @@ from sklearn.model_selection import train_test_split
 
 
 def clean_message(msg):
+    if not isinstance(msg, str):
+        return ""
     msg = msg.lower()
     msg = re.sub(r"http\S+", "", msg)
     msg = re.sub(r"@\w+", "", msg)
@@ -32,14 +34,14 @@ def preprocess_dataframe(df):
     return df[df['cleaned'].str.strip() != ""]
 
 
-df = pd.read_csv("../data/processed/twitch_messages.csv")
+df = pd.read_csv("./data/processed/twitch_messages.csv")
 df_clean = preprocess_dataframe(df)
 
 
 train, temp = train_test_split(df_clean, test_size=0.3, random_state=42)
 val, test = train_test_split(temp, test_size=0.5, random_state=42)
 
-train.to_csv("../data/processed/train.csv", index=False)
-val.to_csv("../data/processed/val.csv", index=False)
-test.to_csv("../data/processed/test.csv", index=False)
+train.to_csv("./data/processed/train.csv", index=False)
+val.to_csv("./data/processed/val.csv", index=False)
+test.to_csv("./data/processed/test.csv", index=False)
 print("Dati salvati correttamente!")

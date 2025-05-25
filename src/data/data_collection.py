@@ -15,10 +15,10 @@ class TwitchDataCollector:
         self.chat_downloader = ChatDownloader()
         self.twitch_downloader = TwitchChatDownloader()
         
-    def get_user_vods(self, username: str, limit: int = 5, sort_by: str = "TIME") -> List[Dict]:
+    def get_user_vods(self, username: str, limit: int = 5, sort: str = "TIME") -> List[Dict]:
         
         print(f" Recuperando VOD per {username}...")
-        vods = self.twitch_downloader.get_vods(username, limit=limit, sort_by=sort_by)
+        vods = self.twitch_downloader.get_user_videos(username, limit=limit, sort=sort)
         
         vod_list = []
         for vod in vods:
@@ -66,7 +66,7 @@ class TwitchDataCollector:
         vod_ids = [vod['id'] for vod in vods]
         print(f"📋 VOD IDs: {vod_ids}")
         
-        all_chats = []
+        all_chats = {}
         for i, vod_id in enumerate(vod_ids, 1):
             print(f"📥 Processando VOD {i}/{len(vod_ids)}: {vod_id}")
             vod_url = f"https://www.twitch.tv/videos/{vod_id}"
@@ -128,8 +128,6 @@ def main_data_collection():
     collector = TwitchDataCollector()
 
     streamers = [
-        "DarioMocciaTwitch",
-        "Tumblurr",
         "lollolacustre"
     ]
     
