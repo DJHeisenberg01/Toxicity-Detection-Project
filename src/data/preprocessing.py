@@ -1,14 +1,17 @@
-
 import pandas as pd
 import json
 import re
 from sklearn.model_selection import train_test_split
 
+def filter_emotes(msg):
+    pass
 
 def clean_message(msg):
     if not isinstance(msg, str):
         return ""
 
+    #msg = filter_emotes(msg)
+    print(f"MESSAGGIO PRIMA: {msg}")
     msg = msg.lower()
     msg = re.sub(r"http\S+", "", msg)                # Rimuovi URL
     msg = re.sub(r"@\w+", "", msg)                   # Rimuovi mention
@@ -16,6 +19,7 @@ def clean_message(msg):
     msg = re.sub(r"\b!?\w*prime\w*!?\b", "", msg)    # Rimuovi comandi tipo !prime
     msg = re.sub(r"\s+", " ", msg).strip()           # Spazi extra
     msg = re.sub(r"(.)\1{2,}", r"\1", msg)           # Riduci ripetizioni di lettere
+    print(f"MESSAGGIO dopo: {msg}")
     return msg
 
 
@@ -50,9 +54,12 @@ def preprocess_dataframe(df):
 
 if __name__ == "__main__":
     # Carica dati da JSON
-    df = load_json("cleaned_convert.json")
-    df_clean = preprocess_dataframe(df)
+    df = load_json("data/raw/all_collected_data.json")
+    #df_clean = preprocess_dataframe(df)
+    df_clean = preprocess_dataframe(df.iloc[100:110])
 
+    #df_clean.to_csv("data/processed/cleaned_twitch_messages.csv", index=False)
+    
 
     #Creazione dello splitting (da capire se farlo qui o altrove)
     '''
