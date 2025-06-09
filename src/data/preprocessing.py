@@ -3,15 +3,28 @@ import json
 import re
 from sklearn.model_selection import train_test_split
 
-def filter_emotes(msg):
-    pass
+def filter_emotes(message, all_emotes):
+    emotes_in_message = []
+    
+    # Per ogni parola nel messaggio
+    for word in message.split():
+        # Per ogni set di emotes (es. globali, streamer1, streamer2, ecc.)
+        for emote_set in all_emotes.values():
+            # Se la parola è un'emote
+            if word in emote_set:
+                # Rimuovi l'emote dal messaggio
+                # message = message.replace(word, "")
+                
+                # Aggiungi l'emote alla lista di emotes usate in quel messaggio
+                emotes_in_message.append(word) if word not in emotes_in_message else None
+    
+    return emotes_in_message
+              
 
 def clean_message(msg):
     if not isinstance(msg, str):
         return ""
 
-    #msg = filter_emotes(msg)
-    print(f"MESSAGGIO PRIMA: {msg}")
     msg = msg.lower()
     msg = re.sub(r"http\S+", "", msg)                # Rimuovi URL
     msg = re.sub(r"@\w+", "", msg)                   # Rimuovi mention
@@ -19,19 +32,28 @@ def clean_message(msg):
     msg = re.sub(r"\b!?\w*prime\w*!?\b", "", msg)    # Rimuovi comandi tipo !prime
     msg = re.sub(r"\s+", " ", msg).strip()           # Spazi extra
     msg = re.sub(r"(.)\1{2,}", r"\1", msg)           # Riduci ripetizioni di lettere
-    print(f"MESSAGGIO dopo: {msg}")
+
     return msg
 
 
 def load_json(path):
     with open(path, 'r', encoding='utf-8') as f:
         data = json.load(f)
+    
+    # Carica il dizionario di emotes da un file JSON
+    with open("api/all_emotes.json", 'r', encoding='utf-8') as f:
+        all_emotes = json.load(f)
+    
     rows = []
     for video_url, messages in data.items():
         for msg in messages:
             author = msg.get("author", "")
             message = msg.get("message", "")
             badges = msg.get("badges", [])
+            
+            # Filtro delle emotes
+            emotes_in_msg_list = filter_emotes(message, all_emotes)
+            
             # Filtro messaggi da bot noti (come StreamElements)
             if author.lower() in ["streamelements", "nightbot"]:
                 continue
@@ -39,7 +61,8 @@ def load_json(path):
                 'author': author,
                 'message': message,
                 'badges': badges,
-                'video_url': video_url
+                'video_url': video_url,
+                'emotes': emotes_in_msg_list
             })
     return pd.DataFrame(rows)
 
@@ -55,9 +78,12 @@ def preprocess_dataframe(df):
 if __name__ == "__main__":
     # Carica dati da JSON
     df = load_json("data/raw/all_collected_data.json")
+
     #df_clean = preprocess_dataframe(df)
     df_clean = preprocess_dataframe(df.iloc[100:110])
-
+    
+    print(df_clean)
+    
     #df_clean.to_csv("data/processed/cleaned_twitch_messages.csv", index=False)
     
 
