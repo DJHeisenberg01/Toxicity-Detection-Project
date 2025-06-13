@@ -13,12 +13,12 @@ def filter_emotes(message, all_emotes):
             # Se la parola è un'emote
             if word in emote_set:
                 # Rimuovi l'emote dal messaggio
-                # message = message.replace(word, "")
+                message = message.replace(word, "")
                 
                 # Aggiungi l'emote alla lista di emotes usate in quel messaggio
                 emotes_in_message.append(word) if word not in emotes_in_message else None
     
-    return emotes_in_message
+    return emotes_in_message, message
               
 
 def clean_message(msg):
@@ -48,29 +48,30 @@ def load_json(path):
     for video_url, messages in data.items():
         for msg in messages:
             author = msg.get("author", "")
+            author_id = msg.get("author_id", "")
             message = msg.get("message", "")
             badges = msg.get("badges", [])
             
             # Filtro delle emotes
-            emotes_in_msg_list = filter_emotes(message, all_emotes)
+            emotes_in_msg_list, message1 = filter_emotes(message, all_emotes)
             
             # Filtro messaggi da bot noti (come StreamElements)
             if author.lower() in ["streamelements", "nightbot"]:
                 continue
             rows.append({
                 'author': author,
-                'message': message,
+                'author_id': author_id,
+                'message': message1,
                 'badges': badges,
-                'video_url': video_url,
                 'emotes': emotes_in_msg_list
             })
     return pd.DataFrame(rows)
 
 
 def preprocess_dataframe(df):
-    df['cleaned'] = df['message'].apply(clean_message)
+    df['message'] = df['message'].apply(clean_message)
     # Rimuove righe vuote o pulite troppo brevi
-    df = df[df['cleaned'].str.strip().str.len() > 1]
+    df = df[df['message'].str.strip().str.len() > 1]
     return df
 
 
@@ -79,12 +80,11 @@ if __name__ == "__main__":
     # Carica dati da JSON
     df = load_json("data/raw/all_collected_data.json")
 
-    #df_clean = preprocess_dataframe(df)
-    df_clean = preprocess_dataframe(df.iloc[100:110])
+    df_clean = preprocess_dataframe(df)
     
     print(df_clean)
     
-    #df_clean.to_csv("data/processed/cleaned_twitch_messages.csv", index=False)
+    df_clean.to_csv("data/processed/cleaned_twitch_messages.csv", index=False)
     
 
     #Creazione dello splitting (da capire se farlo qui o altrove)

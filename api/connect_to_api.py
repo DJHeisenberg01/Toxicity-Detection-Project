@@ -76,7 +76,7 @@ async def main(streamer_names):
 
 if __name__ == "__main__":
     # Lista di streamer da cui ottenere le emotes
-    streamer_names = ["lollolacustre", "dariomocciatwitch"]
+    streamer_names = ["lollolacustre", "NanniTwitch", "Poly", "MarioSturniolo", "Cydonia_Chiara"]
     
     # Avvio della funzione principale
     asyncio.run(main(streamer_names))

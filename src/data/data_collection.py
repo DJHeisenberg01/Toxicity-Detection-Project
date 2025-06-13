@@ -47,6 +47,7 @@ class TwitchDataCollector:
                 
                 messages.append({
                     "author": name,
+                    "author_id": author.get("id", ""),
                     "message": message_text,
                     "badges": badge_names,
                     "timestamp": message.get("timestamp", 0),
@@ -108,6 +109,7 @@ def convert_twitch_json_to_dataframe(json_file_path: str) -> pd.DataFrame:
             all_messages.append({
                 'video_url': video_url,
                 'author': msg.get('author', ''),
+                'author_id': msg.get('author_id', ''),
                 'message': msg.get('message', ''),
                 'badges': msg.get('badges', []),
                 'timestamp': msg.get('timestamp', 0),
@@ -128,7 +130,11 @@ def main_data_collection():
     collector = TwitchDataCollector()
 
     streamers = [
-        "lollolacustre"
+        "lollolacustre",
+        "NanniTwitch",
+        "Poly",
+        "MarioSturniolo",
+        "Cydonia_Chiara" 
     ]
     
     all_collected_data = {}
@@ -136,7 +142,7 @@ def main_data_collection():
     for streamer in streamers:
         print(f"Raccolta dati per {streamer}...")
         try:
-            chats = collector.collect_chats_from_user(streamer, n_vods=3)
+            chats = collector.collect_chats_from_user(streamer, n_vods=1)
             all_collected_data.update(chats)
         except Exception as e:
             print(f"Errore nella raccolta dati per {streamer}: {e}")
