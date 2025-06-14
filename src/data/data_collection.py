@@ -38,6 +38,7 @@ class TwitchDataCollector:
         for message in chat:
             if message.get('message_type') == 'text_message':
                 author = message.get("author", {})
+                author_id = author.get("id", "")
                 name = author.get("name", "")
                 message_text = message.get("message", "")
                 badges_full = author.get("badges", [])
@@ -47,7 +48,7 @@ class TwitchDataCollector:
                 
                 messages.append({
                     "author": name,
-                    "author_id": author.get("id", ""),
+                    "author_id": author_id,
                     "message": message_text,
                     "badges": badge_names,
                     "timestamp": message.get("timestamp", 0),

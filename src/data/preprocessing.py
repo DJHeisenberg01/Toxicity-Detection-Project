@@ -8,15 +8,13 @@ def filter_emotes(message, all_emotes):
     
     # Per ogni parola nel messaggio
     for word in message.split():
-        # Per ogni set di emotes (es. globali, streamer1, streamer2, ecc.)
-        for emote_set in all_emotes.values():
-            # Se la parola è un'emote
-            if word in emote_set:
-                # Rimuovi l'emote dal messaggio
-                message = message.replace(word, "")
-                
-                # Aggiungi l'emote alla lista di emotes usate in quel messaggio
-                emotes_in_message.append(word) if word not in emotes_in_message else None
+        # Se la parola è un'emote
+        if word in all_emotes:
+            # Rimuovi l'emote dal messaggio
+            message = message.replace(word, "")
+            
+            # Aggiungi l'emote alla lista di emotes usate in quel messaggio
+            emotes_in_message.append(word) if word not in emotes_in_message else None
     
     return emotes_in_message, message
               
@@ -40,12 +38,17 @@ def load_json(path):
     with open(path, 'r', encoding='utf-8') as f:
         data = json.load(f)
     
-    # Carica il dizionario di emotes da un file JSON
+    # Carica il dizionario di emotes da un file JSON e inserisci tutte le emotes in un set()
+    all_emotes = set()
     with open("api/all_emotes.json", 'r', encoding='utf-8') as f:
-        all_emotes = json.load(f)
+        emotes_file = json.load(f)
+    
+    for emote_set in emotes_file.values():
+        all_emotes.update(emote_set)
+    
     
     rows = []
-    for video_url, messages in data.items():
+    for messages in data.values():
         for msg in messages:
             author = msg.get("author", "")
             author_id = msg.get("author_id", "")
