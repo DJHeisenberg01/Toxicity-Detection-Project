@@ -59,7 +59,7 @@ class TwitchDataCollector:
         
         return messages
     
-    def collect_chats_from_user(self, username: str, n_vods: int = 3) -> Dict[str, List[Dict]]:
+    def collect_chats_from_user(self, username: str, n_vods: int = 1) -> Dict[str, List[Dict]]:
         
         print(f"Raccolta chat per {username}...")
         
@@ -131,11 +131,16 @@ def main_data_collection():
     collector = TwitchDataCollector()
 
     streamers = [
-        "lollolacustre",
-        "NanniTwitch",
-        "Poly",
-        "MarioSturniolo",
-        "Cydonia_Chiara" 
+        "Tumblurr",
+        "Freneh",
+        "GrenBaud",
+        "ilrossopiubelloditwitch",
+        "Attrix",
+        "Xiuder_",
+        "ilMasseo",
+        "imviolet_",
+        "Paoloidolo",
+        "KasumiSen"        
     ]
     
     all_collected_data = {}
