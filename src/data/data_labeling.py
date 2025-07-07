@@ -2,38 +2,35 @@ import os
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-from transformers import AutoTokenizer, AutoModelForSequenceClassification
+from transformers import AutoTokenizer, AutoModelForSequenceClassification, pipeline
 import torch
 from tqdm import tqdm
+from detoxify import Detoxify
 
 
 # Funzione per stimare la tossicità
-def get_toxicity_score(text):
-    inputs = tokenizer(text, return_tensors="pt", truncation=True, padding=True)
-    with torch.no_grad():
-        outputs = model(**inputs)
-    # Usa il punteggio massimo tra le 6 classi
-    score = torch.sigmoid(outputs.logits)[0].max().item()
-    return score
+def get_max_toxicity(text):
+    try:
+        scores = model.predict(text)
+        return max(scores.values())  # score massimo tra tutte le classi tossiche
+    except:
+        return 0.0
 
 
 if __name__ == "__main__":
     # Carica il modello
-    model_name = "unitary/toxic-bert"
-    tokenizer = AutoTokenizer.from_pretrained(model_name)
-    model = AutoModelForSequenceClassification.from_pretrained(model_name)
+    model = Detoxify('multilingual')
 
     # Carica i messaggi
-    df = pd.read_csv("../../data/processed/cleaned_twitch_messages.csv")
+    df = pd.read_csv("././data/processed/cleaned_twitch_messages.csv")
     
     # Etichetta i messaggi
     tqdm.pandas()
-    df["toxicity_score"] = df["message"].progress_apply(get_toxicity_score)
-    df["label"] = df["toxicity_score"].apply(lambda x: 1 if x >= 0.9 else 0 )
+    df["toxicity_score"] = df["message"].progress_apply(get_max_toxicity)
+    df["label"] = df["toxicity_score"].apply(lambda x: 1 if x >= 0.6 else 0)
     
     # Salva i risultati
-    os.makedirs("./model/data", exist_ok=True)
-    df.to_csv("./model/data/messages_with_toxicity_labels.csv", index=False)
+    df.to_csv("./data/processed/messages_labeled_detoxify.csv", index=False)
     print("✅ Etichettatura completata.")
 
     # Visualizzazione risultati

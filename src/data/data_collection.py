@@ -48,7 +48,6 @@ class TwitchDataCollector:
                 
                 messages.append({
                     "author": name,
-                    "author_id": author_id,
                     "message": message_text,
                     "badges": badge_names,
                     "timestamp": message.get("timestamp", 0),
@@ -91,9 +90,6 @@ class TwitchDataCollector:
         
         print(f"Dati salvati in {filename}")
 
-# FUNZIONE PER PRENDERE DATASET ESTERNI??
-
-# MANCA LA FUNZIONE DI ETICHETTATURA
 
 
 def convert_twitch_json_to_dataframe(json_file_path: str) -> pd.DataFrame:
@@ -110,7 +106,6 @@ def convert_twitch_json_to_dataframe(json_file_path: str) -> pd.DataFrame:
             all_messages.append({
                 'video_url': video_url,
                 'author': msg.get('author', ''),
-                'author_id': msg.get('author_id', ''),
                 'message': msg.get('message', ''),
                 'badges': msg.get('badges', []),
                 'timestamp': msg.get('timestamp', 0),
@@ -148,7 +143,7 @@ def main_data_collection():
     for streamer in streamers:
         print(f"Raccolta dati per {streamer}...")
         try:
-            chats = collector.collect_chats_from_user(streamer, n_vods=1)
+            chats = collector.collect_chats_from_user(streamer, n_vods=2)
             all_collected_data.update(chats)
         except Exception as e:
             print(f"Errore nella raccolta dati per {streamer}: {e}")

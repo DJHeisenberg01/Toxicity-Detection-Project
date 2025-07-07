@@ -285,7 +285,7 @@ class ToxicityDetectionPipeline:
         # Training arguments
         training_args = TrainingArguments(
             output_dir=output_dir,
-            num_train_epochs=5,
+            num_train_epochs=10,
             per_device_train_batch_size=16,
             per_device_eval_batch_size=32,
             warmup_steps=500,
@@ -304,7 +304,6 @@ class ToxicityDetectionPipeline:
             report_to=None,  # Disabilita wandb
             seed=42,
             data_seed=42,
-            # Aggiungi questi parametri per gestire meglio GPU/CPU
             dataloader_pin_memory=False,
             remove_unused_columns=True,
         )
@@ -321,7 +320,7 @@ class ToxicityDetectionPipeline:
             tokenizer=self.tokenizer,
             data_collator=data_collator,
             compute_metrics=self._compute_metrics,
-            callbacks=[EarlyStoppingCallback(early_stopping_patience=3)]
+            callbacks=[EarlyStoppingCallback(early_stopping_patience=10)]
         )
         
         # Training
@@ -446,13 +445,6 @@ class ToxicityDetectionPipeline:
             logger.error("Modello transformer non disponibile!")
             return []
     
-    @staticmethod
-    def load_from_dir(model_dir, model_name="dbmdz/bert-base-italian-cased"):
-        pipeline = ToxicityDetectionPipeline(data_path=None, model_name=model_name)
-        pipeline.tokenizer = AutoTokenizer.from_pretrained(model_dir)
-        pipeline.model = AutoModelForSequenceClassification.from_pretrained(model_dir)
-        pipeline.model.to(pipeline.device)
-        return pipeline
 
 
 # Esempio di utilizzo
@@ -466,8 +458,8 @@ if __name__ == "__main__":
     # Carica e analizza i dati
     df = pipeline.load_and_preprocess_data()
     
-    # Visualizza distribuzione (opzionale)
-    # pipeline.visualize_data_distribution()
+    # Visualizza distribuzione
+    pipeline.visualize_data_distribution()
     
     # Addestra modelli baseline
     baseline_results = pipeline.train_baseline_models()
