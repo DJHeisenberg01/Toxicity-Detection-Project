@@ -465,10 +465,10 @@ if __name__ == "__main__":
     baseline_results = pipeline.train_baseline_models()
     
     # Prepara dati per transformer
-    train_ds, val_ds, test_ds = pipeline.prepare_transformer_data()
+    #train_ds, val_ds, test_ds = pipeline.prepare_transformer_data()
     
     # Fine-tuning transformer
-    trainer = pipeline.train_transformer()
+    #trainer = pipeline.train_transformer()
     
     # Confronta tutti i modelli
     comparison = pipeline.evaluate_all_models()

@@ -18,7 +18,8 @@ def get_max_toxicity(text):
 
 
 if __name__ == "__main__":
-    # Carica il modello
+    
+   # Carica il modello
     model = Detoxify('multilingual')
 
     # Carica i messaggi
@@ -32,6 +33,9 @@ if __name__ == "__main__":
     # Salva i risultati
     df.to_csv("./data/processed/messages_labeled_detoxify.csv", index=False)
     print("✅ Etichettatura completata.")
+    
+
+    df = pd.read_csv("./data/processed/messages_labeled_detoxify.csv")
 
     # Visualizzazione risultati
     sns.set(style="whitegrid")
