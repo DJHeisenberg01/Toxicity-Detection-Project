@@ -6,7 +6,6 @@ from sklearn.model_selection import train_test_split
 def filter_emotes(message, all_emotes):
     emotes_in_message = []
     
-    # Per ogni parola nel messaggio
     for word in message.split():
         # Se la parola è un'emote
         if word in all_emotes:
@@ -79,7 +78,7 @@ def preprocess_dataframe(df):
 
 
 if __name__ == "__main__":
-    # Carica dati da JSON
+    
     df = load_json("data/raw/all_collected_data.json")
 
     df_clean = preprocess_dataframe(df)

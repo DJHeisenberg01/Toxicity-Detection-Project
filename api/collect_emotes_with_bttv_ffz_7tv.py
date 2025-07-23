@@ -15,7 +15,7 @@ async def get_all_emotes(twitch):
     # Get delle emotes globali
     global_emotes = await twitch.get_global_emotes()
 
-    # Di ogni emote, trattieni solo il nome
+    # Di ogni emote, prende solo il nome
     for emote in global_emotes.data:
         emote_names_list.append(emote.name)
     

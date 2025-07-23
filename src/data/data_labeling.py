@@ -12,7 +12,7 @@ from detoxify import Detoxify
 def get_max_toxicity(text):
     try:
         scores = model.predict(text)
-        return max(scores.values())  # score massimo tra tutte le classi tossiche
+        return max(scores.values())  # score massimo tra tutte le classi tossiche (siccome il modello è multiclasse)
     except:
         return 0.0
 

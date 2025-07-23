@@ -10,7 +10,7 @@ from collections import Counter
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-# Transformers imports
+
 from transformers import (
     AutoTokenizer, AutoModelForSequenceClassification, 
     Trainer, TrainingArguments, EarlyStoppingCallback,
@@ -21,7 +21,7 @@ from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_sc
 import os
 import logging
 
-# Setup logging
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -40,7 +40,7 @@ class ToxicityDetectionPipeline:
         self.model = None
         self.vectorizer = None
         
-        # Setup device
+        
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         logger.info(f"Using device: {self.device}")
         
@@ -48,14 +48,11 @@ class ToxicityDetectionPipeline:
         """Carica e preprocessa il dataset"""
         logger.info("Caricamento dataset...")
         
-        # Carica il dataset
         df = pd.read_csv(self.data_path)
         
         # Preprocessing del testo
         df['message'] = df['message'].astype(str)
         df['message'] = df['message'].str.lower().str.strip()
-        
-        # Rimuovi messaggi vuoti o troppo corti
         df = df[df['message'].str.len() > 2]
         
         # Analisi del dataset
@@ -118,7 +115,7 @@ class ToxicityDetectionPipeline:
             ngram_range=(1, 2),
             min_df=2,
             max_df=0.95,
-            stop_words=None  # Mantieni le stop words per questo dominio
+            stop_words=None  
         )
         
         X_train_tfidf = self.vectorizer.fit_transform(X_train)
@@ -175,7 +172,7 @@ class ToxicityDetectionPipeline:
             'auc': roc_auc_score(y_test, y_proba_smote)
         }
         
-        # Stampa risultati
+        
         self._print_baseline_results(results, y_test)
         
         self.baseline_results = results
@@ -259,15 +256,15 @@ class ToxicityDetectionPipeline:
         """Fine-tuning del modello transformer"""
         logger.info(f"Inizio fine-tuning di {self.model_name}...")
         
-        # Carica il modello e spostalo sul device corretto
+        
         self.model = AutoModelForSequenceClassification.from_pretrained(
             self.model_name, 
             num_labels=2,
             problem_type="single_label_classification"
         )
-        self.model.to(self.device)  # IMPORTANTE: sposta il modello sul device
+        self.model.to(self.device)  
         
-        # Calcola class weights e spostali sul device corretto
+        # Calcolo delle class weights e spostali sul device corretto
         class_counts = np.bincount(self.train_dataset['label'])
         class_weights = len(self.train_dataset) / (2 * class_counts)
         class_weights = torch.FloatTensor(class_weights).to(self.device)  # Sposta su device
@@ -301,7 +298,7 @@ class ToxicityDetectionPipeline:
             metric_for_best_model="f1",
             greater_is_better=True,
             save_total_limit=3,
-            report_to=None,  # Disabilita wandb
+            report_to=None, 
             seed=42,
             data_seed=42,
             dataloader_pin_memory=False,
@@ -330,7 +327,7 @@ class ToxicityDetectionPipeline:
         trainer.save_model()
         self.tokenizer.save_pretrained(output_dir)
         
-        # Evaluazione finale
+        # Valutazione finale
         eval_results = trainer.evaluate(eval_dataset=self.test_dataset)
         logger.info(f"Risultati finali: {eval_results}")
         
@@ -421,7 +418,7 @@ class ToxicityDetectionPipeline:
                 return_tensors='pt'
             )
             
-            # IMPORTANTE: sposta i tensori sul device corretto
+            
             encoded = {k: v.to(self.device) for k, v in encoded.items()}
             
             # Predizione
@@ -452,7 +449,7 @@ if __name__ == "__main__":
     # Inizializza la pipeline
     pipeline = ToxicityDetectionPipeline(
         data_path="././data/processed/messages_labeled_detoxify.csv",
-        model_name="dbmdz/bert-base-italian-cased"  # Modello italiano
+        model_name="dbmdz/bert-base-italian-cased"  
     )
     
     # Carica e analizza i dati
@@ -465,19 +462,19 @@ if __name__ == "__main__":
     baseline_results = pipeline.train_baseline_models()
     
     # Prepara dati per transformer
-    #train_ds, val_ds, test_ds = pipeline.prepare_transformer_data()
+    train_ds, val_ds, test_ds = pipeline.prepare_transformer_data()
     
     # Fine-tuning transformer
-    #trainer = pipeline.train_transformer()
+    trainer = pipeline.train_transformer()
     
     # Confronta tutti i modelli
     comparison = pipeline.evaluate_all_models()
     
     # Test su esempi
     test_texts = [
-        "Ciao, come stai?",
+        "Ciao come stai?",
         "Sei un idiota completo",
-        "Grande partita oggi!",
+        "Grande partita oggi",
         "Vai a morire stupido"
     ]
     

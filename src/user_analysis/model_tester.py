@@ -85,7 +85,7 @@ class ToxicityModelTester:
                 return_tensors='pt'
             )
             
-            # Sposta tensori sul device
+            
             encoded = {k: v.to(self.device) for k, v in encoded.items()}
             
             with torch.no_grad():

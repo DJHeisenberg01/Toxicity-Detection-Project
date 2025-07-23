@@ -588,10 +588,10 @@ def create_interface():
     return interface
 
 if __name__ == "__main__":
-    # Crea e lancia l'interfaccia
+    
     interface = create_interface()
     interface.launch(
-        share=True,  # Crea un link pubblico
-        server_name="0.0.0.0",  # Accessibile da qualsiasi IP
-        server_port=7860  # Porta predefinita
+        share=True,  
+        server_name="0.0.0.0",  
+        server_port=7860  
     )

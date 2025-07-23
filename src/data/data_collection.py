@@ -43,7 +43,7 @@ class TwitchDataCollector:
                 message_text = message.get("message", "")
                 badges_full = author.get("badges", [])
                 
-                # Estrai solo i nomi dei badge
+                # Estrae solo i nomi dei badge
                 badge_names = [badge.get("name", "") for badge in badges_full]
                 
                 messages.append({
